@@ -5,6 +5,8 @@ using SalesAnalysisApp.Repository;
 using SalesAnalysisApp.Service;
 using SalesAnalysisApp;
 using System;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,9 +16,20 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<SalesDbContext>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-    );
+builder.Services.AddDbContext<SalesDbContext>(options =>
+options.UseSqlServer("server=VARCHINIDEVI\\SQLEXPRESS; database=SaleAnalysisDb;Encrypt=false; Trusted_Connection=true",
+        sqlServerOptionsAction =>
+        {
+            // Enable retry logic for transient failures
+            sqlServerOptionsAction.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null
+            );
+        }
+    )
+);
+
 
 builder.Services.AddScoped<ISalesRepository,SalesRepository>();
 builder.Services.AddScoped<IDataRefreshService, DataRefreshService>();

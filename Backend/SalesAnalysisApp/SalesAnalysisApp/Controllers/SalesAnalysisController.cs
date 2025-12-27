@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SalesAnalysisApp.Repository;
 using SalesAnalysisApp.Dtos;
 using SalesAnalysisApp.Entities;
+using Microsoft.Extensions.Logging;
 namespace SalesAnalysisApp.Controllers
 {
     [Route("api/[controller]")]
@@ -10,15 +11,15 @@ namespace SalesAnalysisApp.Controllers
     public class SalesAnalysisController : ControllerBase
     {
         public readonly ISalesRepository _salesRepository;
-        public readonly ILogger _logger;
+       // public readonly ILogger _logger;
 
-        public SalesAnalysisController(ISalesRepository salesRepository, ILogger logger)
+        public SalesAnalysisController(ISalesRepository salesRepository)
         {
             _salesRepository = salesRepository;
-            _logger = logger;
+          //  _logger = logger;
         }
 
-        [HttpGet("revenue/total")]
+        [HttpPost("revenue/total")]
         public async Task<ActionResult<ApiResponse<RevenueResponse>>> GetTotalRevenue(inputRequest request)
         {
             var revenue = await _salesRepository.GetTotalRevenueAsync(request.startDate, request.endDate);
@@ -47,7 +48,7 @@ namespace SalesAnalysisApp.Controllers
 
         }
 
-        [HttpGet("revenue/byProduct")]
+        [HttpPost("revenue/byProduct")]
         public async Task<ActionResult<ApiResponse<object>>> GetRevenueByProduct(inputRequest request)
         {
             var data = await _salesRepository.GetREvenueByProductAsync(request.startDate, request.endDate);
@@ -76,7 +77,7 @@ namespace SalesAnalysisApp.Controllers
 
         }
 
-        [HttpGet("revenue/byRegion")]
+        [HttpPost("revenue/byRegion")]
         public async Task<ActionResult<ApiResponse<object>>> GetRevenueByRegion(inputRequest request)
         {
             var data = await _salesRepository.GetREvenueByRegionAsync(request.startDate, request.endDate);
@@ -106,7 +107,7 @@ namespace SalesAnalysisApp.Controllers
         }
 
 
-        [HttpGet("revenue/byCategory")]
+        [HttpPost("revenue/byCategory")]
         public async Task<ActionResult<ApiResponse<object>>> GetRevenueByCategory(inputRequest request)
         {
             var data = await _salesRepository.GetRevenueByCategoryAsync(request.startDate, request.endDate);
@@ -134,7 +135,7 @@ namespace SalesAnalysisApp.Controllers
             }
 
         }
-        [HttpGet("revenue/getTopProduct")]
+        [HttpPost("revenue/getTopProduct")]
         public async Task<ActionResult<ApiResponse<object>>> GetTopProducts(int top, string category, string region)
         {
             if (top <= 0)
@@ -166,8 +167,8 @@ namespace SalesAnalysisApp.Controllers
             }
 
         }
-        [HttpGet("revenue/getCustomerReport")]
-        public async Task<ActionResult<ApiResponse<CustomerReportResponse>>> GetCustomerReport(inputRequest request)
+        [HttpPost("revenue/getCustomerReport")]
+        public async Task<ActionResult<ApiResponse<CustomerReportResponse>>> GetCustomerReport([FromBody]inputRequest request)
         {
             var data = await _salesRepository.GetCustomerReportAnalysisAsync(request.startDate, request.endDate);
             if (data != null)
